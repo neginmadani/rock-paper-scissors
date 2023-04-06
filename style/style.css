@@ -1,0 +1,70 @@
+body{
+    display: flex;
+    background-color: peachpuff;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#content{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+}
+
+button{
+    margin: 10px;
+    width: 120px;
+    font-size: 22px;
+    background-color: peachpuff;
+    border-style: solid;
+    border-color: rgba(186, 93, 59, 0.62);
+    color: rgb(186, 93, 59);
+    border-radius: 4px;
+    transition-duration: 0.2s;
+    margin: 30px 10px;
+
+}
+
+button:hover{
+    transform: scale(1.1) perspective(1px);
+}
+
+button:active {
+    background-color: rgba(251, 151, 114, 0.813);
+    transform: translateX(2px);
+  }
+
+.prompt{
+    font-size: 110px;
+    font-weight: bolder;
+    color: coral;
+    padding-top: 250px;
+}
+
+.scoreboard{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 440px;
+    height: 100px;
+    border-style: solid;;
+    border-color:rgb(186, 93, 59);
+    color: rgb(186, 93, 59);
+    font-size: 22px;
+    margin: 50px 0px;
+}
+
+#player,
+#computer{
+    width: 150px;
+}
+
+.textbox{
+    color: rgb(186, 93, 59);
+    font-size: 26px;
+    font-weight: bold;
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

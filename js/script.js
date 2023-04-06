@@ -1,3 +1,25 @@
+initializeGame();
+
+function initializeGame(){
+    enableGameButtons();
+    let txtbox = document.querySelector('.textbox');
+    txtbox.textContent = "Let's play! First to 5 wins the game";
+}
+
+function playRound(){
+    let playerSelection = this.id;
+    let computerSelection = getComputerChoice();
+    let roundWinner = findRoundWinner(playerSelection, computerSelection);
+    declareRoundWinner(roundWinner, playerSelection, computerSelection);
+    updateScoreBox(roundWinner);
+    let fiveWins = checkForFiveWins(roundWinner);
+    if (fiveWins == true){
+        declareFinalWinner(roundWinner);
+        disableGameButtons();
+        createPlayAgainButton();
+    }
+}
+
 function getComputerChoice(){
     randomNumber = Math.floor(Math.random() * 3) + 1;
     let computerChoice;
@@ -16,76 +38,114 @@ function getComputerChoice(){
     return computerChoice;
 }
 
-function playRound(playerSelection, computerSelection){
-    //if playerSelection is rock, it beats scissors
+function findRoundWinner(playerSelection, computerSelection){
+    let winner;
     if (playerSelection == "Rock" && computerSelection == "Scissors"){
-        console.log("You Win! Rock beats Scissors");
-        return "player won";
+        winner = "player";
     }
-    //if playerSelection is paper, it beats rock
     else if (playerSelection == "Paper" && computerSelection == "Rock"){
-        console.log("You Win! Paper beats Rock");
-        return "player won";
+        winner = "player";
     }
-    //if playerSelection is scissors, it beats paper
     else if (playerSelection == "Scissors" && computerSelection == "Paper"){
-        console.log("You Win! Scissors beats Paper");
-        return "player won";
+        winner = "player";
     }
-    //if playerSelection is the same as computerSelection, no-one wins
     else if (playerSelection == computerSelection){
-        console.log(`${playerSelection} vs ${computerSelection}! That's a Tie`);
-        return "tie";
+        winner = "tie";
     }
-    //if none of the above is true, computer wins
     else{
-        console.log(`You Lose! ${computerSelection} beats ${playerSelection}`);
-        return "computer won";
+        winner = "computer";
+    }
+    return winner;
+}
+
+function declareRoundWinner(winner, playerSelection, computerSelection){
+    txtbox = document.querySelector('.textbox');
+    if(winner == 'player'){
+        txtbox.textContent = `You win this round! ${playerSelection} beats ${computerSelection}.`;
+    }
+    else if(winner == 'computer'){
+        txtbox.textContent = `Computer wins this round! ${computerSelection} beats ${playerSelection}.`;
+    }
+    else{
+        txtbox.textContent = `${playerSelection} vs ${computerSelection}! It's a Tie.`
     }
 }
 
-function reformatPlayerSelection(playerSelection){
-    let firstCharacter = playerSelection[0].toUpperCase();
-    let selectionMinusFirstCharacter = playerSelection.slice(1).toLowerCase();
-    return firstCharacter + selectionMinusFirstCharacter;
-}
-
-function game(){
-    let playerScore = 0;
-    let computerScore = 0;
-    //play 5 rounds
-    for(let roundCount = 1; roundCount <= 5; roundCount++){
-        //print round number
-        console.log(`**** Round ${roundCount} ****`);
-        //loop until the player enters a correct input
-        let isSelectionCorrect  = false;
-        let playerSelection = null;
-        while (isSelectionCorrect == false) {
-            playerSelection = prompt("Enter your selection: Rock, Paper or Scissors\n");
-            //exit the game if the player cancels
-            if(playerSelection == null) {
-                console.log("Game cancelled");
-                return;
-            }
-            //reformat the player input to make the first character capitalized
-            playerSelection = reformatPlayerSelection(playerSelection);
-            if (playerSelection == "Rock" || playerSelection == "Paper" || playerSelection == "Scissors") {
-                isSelectionCorrect = true;
-            }
-            else console.log("Wrong selection! Try again");
-        }
-        //get the computer's selection
-        let computerSelection = getComputerChoice();
-        //play a round
-        let roundResult = playRound(playerSelection, computerSelection);
-        //adjust total score
-        if (roundResult == "player won") playerScore++;
-        else if (roundResult == "computer won") computerScore++;
+function updateScoreBox(roundWinner){
+    if(roundWinner == 'player' || roundWinner == 'computer'){
+        let scoreBox = document.querySelector(`#${roundWinner}`);
+        let currentScore = extractScore(scoreBox.textContent);
+        let newScore = currentScore + 1;
+        updateScore(scoreBox, newScore);
     }
-    //print the winner
-    if(playerScore > computerScore) console.log(`You Win ${playerScore} to ${computerScore}`);
-    else if(playerScore < computerScore) console.log(`Computer Wins ${computerScore} to ${playerScore}`)
-    else console.log("It's a Tie");
 }
 
-game();
+function checkForFiveWins(roundWinner){
+    let scoreBox = document.querySelector(`#${roundWinner}`);
+    let score = extractScore(scoreBox.textContent);
+    if(score == 5) return true;
+    return false;
+}
+
+function extractScore(string){
+    let stringArray = string.split(" ");
+    let score = Number(stringArray[1]);
+    return score;
+}
+
+function updateScore(scoreBox, newScore){
+    let string = scoreBox.textContent;
+    let stringArray = string.split(" ");
+    let newString = stringArray[0] + " " + newScore;
+    scoreBox.textContent = newString;
+}
+
+function declareFinalWinner(winnerName){
+    let txtbox = document.querySelector('.textbox');
+    let newTxtBox = document.createElement('div');
+    newTxtBox.style.cssText = 'margin-top: 20px;';
+    newTxtBox.setAttribute('id', 'winner-box');
+    if(winnerName == 'player'){
+        newTxtBox.textContent = 'You won!';
+    }
+    else if(winnerName == 'computer'){
+        newTxtBox.textContent = 'You lost!';
+    }
+    txtbox.appendChild(newTxtBox);
+}
+
+function createPlayAgainButton(){
+    const txtbox = document.querySelector('.textbox');
+    const playAgainButton = document.createElement('button');
+    playAgainButton.textContent = 'Play Again?'
+    playAgainButton.style.cssText = 'width: 200px;';
+    playAgainButton.addEventListener('click',resetGame);
+    txtbox.appendChild(playAgainButton);
+}
+
+function resetGame(){
+    //reset scoreboard
+    let playerScore = document.querySelector('#player');
+    updateScore(playerScore, 0);
+    let computerScore = document.querySelector('#computer');
+    updateScore(computerScore, 0);
+
+    //remove play-again buttun and final winner declaration
+    let txtbox = document.querySelector('.textbox');
+    let playAgainButton = txtbox.lastChild;
+    delete txtbox.removeChild(playAgainButton);
+    let finalWinner = txtbox.lastChild;
+    delete txtbox.removeChild(finalWinner);
+
+    initializeGame();
+}
+
+function enableGameButtons(){
+    const gameButtons = document.querySelectorAll('.game-button');
+    gameButtons.forEach(btn => btn.addEventListener('click', playRound));
+}
+
+function disableGameButtons(){
+    const gameButtons = document.querySelectorAll('.game-button');
+    gameButtons.forEach(btn => btn.removeEventListener('click', playRound));
+}
